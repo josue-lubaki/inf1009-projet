@@ -1,12 +1,12 @@
 package Paquet;
 
-public class PaquetDonnes {
+public class PaquetDonnees {
     private int numeroConnexion;
     private byte[] type;
     private String donnees;
     // P(s), P(R) et M
 
-    public PaquetDonnes(int numeroConnexion, byte[] type, String donnees) {
+    public PaquetDonnees(int numeroConnexion, byte[] type, String donnees) {
         this.numeroConnexion = numeroConnexion;
         this.type = type;
         this.donnees = donnees;
