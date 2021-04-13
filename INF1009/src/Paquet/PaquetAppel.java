@@ -4,8 +4,6 @@ import Enum.Directive;
 
 public class PaquetAppel extends Paquet {
     private Directive type;
-    private int adresseSource;
-    private int adresseDestination;
 
     public PaquetAppel(int adresseSource, int adresseDestination) {
         super(adresseSource,adresseDestination);
@@ -21,24 +19,27 @@ public class PaquetAppel extends Paquet {
         this.type = type;
     }
 
-    @Override
     public int getAdresseSource() {
         return adresseSource;
     }
 
-    @Override
     public void setAdresseSource(int adresseSource) {
         this.adresseSource = adresseSource;
     }
 
-    @Override
     public int getAdresseDestination() {
         return adresseDestination;
     }
 
-    @Override
     public void setAdresseDestination(int adresseDestination) {
         this.adresseDestination = adresseDestination;
     }
+
+    @Override
+    public String toString() {
+        return type + " " + adresseSource + " " + adresseDestination;
+    }
+
+    
     
 }

@@ -1,15 +1,19 @@
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
 
 import Couche.Transport;
 import Paquet.Npdu;
-
+import Couche.Reseau;
 
 
 public class Main {
-    private static Queue<Npdu> CanalTransportToReseau = new SynchronousQueue<Npdu>();
-    //private static Transport transport = new Transport(CanalTransportToReseau);
-    private static Transport transport = new Transport();
+    private static Queue<Npdu> canalTransportToReseau = new LinkedList<>();
+    private static Queue<Npdu> canalReseauToTransport = new LinkedList<>();
+    private static Queue<Npdu> canalReseauToProcessing = new LinkedList<>();
+    private static Queue<Npdu> canalProcessingToReseau = new LinkedList<>();
+    private static Transport transport = new Transport(canalTransportToReseau, canalReseauToTransport);
+    private static Reseau reseau = new Reseau(canalTransportToReseau, canalReseauToTransport, canalReseauToProcessing, canalProcessingToReseau);
+    //private static Transport transport = new Transport();
     private static String message;
     private static int nbTest = 0;
     private static Thread lireDeTransport, ecrireDeTransport, lireDeReseau, ecrireDeReseau;
@@ -48,7 +52,7 @@ public class Main {
         lireDeTransport.start();
 
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -58,10 +62,16 @@ public class Main {
         ecrireDeTransport.start(); 
         
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        lireDeReseau = new Thread(reseau::ReadPaquetFromTransport);
+        lireDeReseau.setName("Thread-lireDeReseau");
+        lireDeReseau.start();
+
+
     }
 
 

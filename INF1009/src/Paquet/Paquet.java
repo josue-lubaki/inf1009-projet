@@ -10,7 +10,7 @@ public abstract class Paquet {
     }
 
     public int getAdresseSource() {
-        return adresseSource;
+            return adresseSource;
     }
 
     public void setAdresseSource(int adresseSource) {
@@ -29,17 +29,17 @@ public abstract class Paquet {
     public String toString() {
         if(this instanceof PaquetAppel){
             PaquetAppel paquet = (PaquetAppel)this;
-            return paquet.getType() + " " + adresseDestination + " " + adresseSource;
+            return paquet.getType() + " " + paquet.getAdresseSource() + " " +  paquet.getAdresseDestination();
         }
            
         else if(this instanceof PaquetDonnees){
             PaquetDonnees paquet = (PaquetDonnees)this;
-            return paquet.getType() + " " + adresseDestination + " " + paquet.getDonnees();
+            return paquet.getType() + " " + paquet.getAdresseDestination() + " " + paquet.getDonnees();
         }
             
         else if(this instanceof PaquetLiberation){
             PaquetLiberation paquet = (PaquetLiberation)this;
-            return paquet.getType() + " " + adresseDestination + " " + adresseSource;
+            return paquet.getType() + " " + paquet.getAdresseSource() + " " + paquet.getAdresseDestination();
         }
 
         return "Paquet [adresseDestination=" + adresseDestination + ", adresseSource=" + adresseSource + "]";

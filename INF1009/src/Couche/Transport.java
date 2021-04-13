@@ -1,5 +1,8 @@
 package Couche;
 
+import static MyUtils.Constante.S_ECR;
+import static MyUtils.Constante.S_LEC;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,13 +10,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 
 import Paquet.Npdu;
+import Paquet.Paquet;
+import Enum.Directive;
 import Paquet.PaquetAppel;
 import Paquet.PaquetDonnees;
 import Paquet.PaquetLiberation;
@@ -21,29 +25,24 @@ import Paquet.PaquetLiberation;
 public class Transport {
    
     Thread threadTransport, lireDeTransport, ecrireDeTransport;
-    private final String S_LEC = "jeu_essai/s_lec.txt";
-    private final String S_ECR = "jeu_essai/s_ecr.txt";
-    private Queue<Npdu> CanalTransportToReseau;
+    private Queue<Npdu> canalTransportToReseau;
+    private Queue<Npdu> canalReseauToTransport;
     private static List<Npdu> listControlConnection = new ArrayList<>();
 
-    public Transport(Queue<Npdu> canalTransportToReseau2) {
-        this.CanalTransportToReseau = canalTransportToReseau2;
+    public Transport(Queue<Npdu> canalTransportToReseau, Queue<Npdu> canalReseauToTransport) {
+        this.canalTransportToReseau = canalTransportToReseau;
+        this.canalReseauToTransport = canalReseauToTransport;
     }
-
-    public Transport() {
-        this.CanalTransportToReseau = new LinkedList<>();
-    }
-
 
     /**
      * Methode qui permet de lire le fichier S_lec.txt
      */
-    public void readFromTransport(){
+    public synchronized void readFromTransport(){
         File myFile = new File(S_LEC);
         Npdu transportToReseau;
-        PaquetAppel paquetAppel;
-        PaquetDonnees paquetDonnee;
-        PaquetLiberation paquetLiberation;
+        Paquet paquetAppel;
+        Paquet paquetDonnee;
+        Paquet paquetLiberation;
         try(Scanner myReader = new Scanner(myFile)){
             while(myReader.hasNextLine()){
                 transportToReseau = new Npdu();
@@ -67,20 +66,33 @@ public class Transport {
                     switch (directive) {
                         case "N_CONNECT":{
                             paquetAppel = new PaquetAppel(numeroSource,numeroDestination);
+                            transportToReseau.type = Directive.N_CONNECT_req;
+                            transportToReseau.adresseSource = numeroSource;
+                            transportToReseau.adressedestination = numeroDestination;
                             transportToReseau.paquet = paquetAppel;
-                            validNpdu = true;
                             transportToReseau.connection = genererNumeroConnection();
+                            //transportToReseau.data = transportToReseau.toString();
+                            validNpdu = true;
                             break;
                         }
                         case "N_DATA":{
                             paquetDonnee = new PaquetDonnees(numeroSource, numeroDestination, dataFile[3]);
+                            transportToReseau.type = Directive.N_DATA_req;
+                            transportToReseau.adresseSource = numeroSource;
+                            transportToReseau.adressedestination = numeroDestination;
                             transportToReseau.paquet = paquetDonnee;
+                            transportToReseau.data = dataFile[3];
                             validNpdu = true;
+
                             break;
                         }
                         case "N_DISCONNECT":{
                             paquetLiberation = new PaquetLiberation(numeroSource, numeroDestination);
+                            transportToReseau.type = Directive.N_DISCONNECT_req;
+                            transportToReseau.adresseSource = numeroSource;
+                            transportToReseau.adressedestination = numeroDestination;
                             transportToReseau.paquet = paquetLiberation;
+                            //transportToReseau.data = transportToReseau.toString();
                             validNpdu = true;
                             break;
                         }
@@ -119,8 +131,12 @@ public class Transport {
             PrintWriter out = new PrintWriter(bw)
             ){
 
-            CanalTransportToReseau.forEach(e ->{
-                    out.println(e.toString());
+            /*canalTransportToReseau.forEach(e ->{
+                    out.println(e.type + " " + e.adresseSource + " " + e.adressedestination + " " 
+                    + e.data==null?"":e.data);
+            });*/
+            canalTransportToReseau.forEach(e ->{
+                out.println(e.toString());
             });
                 
         } catch (FileNotFoundException e) {
@@ -169,8 +185,8 @@ public class Transport {
      * @throws IllegalStateException : La methode a été invoquer de manière illégal ou un moment inapproprié !
      * @return void
      */
-    private void envoyerVersReseau(Npdu paquet) throws IllegalStateException{
-        CanalTransportToReseau.offer(paquet);
+    private void envoyerVersReseau(Npdu connectPaquet) throws IllegalStateException{
+        canalTransportToReseau.offer(connectPaquet);
     }
 
     /**
@@ -180,23 +196,26 @@ public class Transport {
      * @return void
      */
     private void ajouterConnection(Npdu connectPaquet){
-        if(!isConnectionExist(connectPaquet.paquet.getAdresseSource(), connectPaquet.paquet.getAdresseDestination()))
+        if(!isConnectionExist(connectPaquet.adresseSource, connectPaquet.adressedestination)){
+            // Mettre le status à non-connecté
+            connectPaquet.status = false;
             listControlConnection.add(connectPaquet);
+        }
+
 
         //if(connectPaquet.status)
-            envoyerVersReseau(connectPaquet);
+        envoyerVersReseau(connectPaquet);
     }
 
 
      /**
       * Methode qui permet de vérifier si la connection existe déjà dans la liste de connexion du transportToReseau
-      * @param numeroConnection : Le paquet dont on veut vérifier l'existence précedente
       * @return boolean
       */
     private boolean isConnectionExist(int adresseSource, int adresseDestination){
         for (Npdu npdu : listControlConnection) {
-            if(npdu.paquet.getAdresseSource() == adresseSource &&
-                npdu.paquet.getAdresseDestination() == adresseDestination ){
+            if(npdu.adresseSource == adresseSource &&
+                npdu.adressedestination == adresseDestination ){
                 return true;
             }
         }
@@ -240,6 +259,27 @@ public class Transport {
     public int setAdresseDestination(){
         return getRandomNumber(255);
     }
+
+    /* ***************************************************************************** */
+    /* ***************************  GETTER & SETTER  ******************************* */
+    /* ***************************************************************************** */
+    public Queue<Npdu> getCanalTransportToReseau() {
+        return canalTransportToReseau;
+    }
+
+    public void setCanalTransportToReseau(Queue<Npdu> canalTransportToReseau) {
+        this.canalTransportToReseau = canalTransportToReseau;
+    }
+
+    public Queue<Npdu> getCanalReseauToTransport() {
+        return canalReseauToTransport;
+    }
+
+    public void setCanalReseauToTransport(Queue<Npdu> canalReseauToTransport) {
+        this.canalReseauToTransport = canalReseauToTransport;
+    }
+
+    
 
 	 
 }
