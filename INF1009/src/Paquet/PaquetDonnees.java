@@ -5,11 +5,10 @@ import Enum.Directive;
 public class PaquetDonnees extends Paquet{
     private Directive type;
     private String donnees;
-    private int adresseDestination;
     // P(s), P(R) et M
 
-    public PaquetDonnees(int addresseSource, int adresseDestination, String donnees) {
-        super(addresseSource,adresseDestination);
+    public PaquetDonnees(int adresseSource, int adresseDestination, String donnees) {
+        super(adresseSource,adresseDestination);
         this.type = Directive.N_DATA_req;
         this.donnees = donnees;
     }
@@ -38,5 +37,17 @@ public class PaquetDonnees extends Paquet{
         this.donnees = donnees;
     }
 
-  
+    public int getAdresseSource() {
+        return adresseSource;
+    }
+    
+    public void setAdresseSource(int adresseSource) {
+        this.adresseSource = adresseSource;
+    }
+
+    @Override
+    public String toString() {
+        return type + " " + adresseSource + " " +  adresseDestination + " " + donnees;
+    }
+ 
 }
