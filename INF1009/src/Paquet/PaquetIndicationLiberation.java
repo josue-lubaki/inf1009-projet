@@ -1,35 +1,24 @@
 package Paquet;
 
+import Enum.Directive;
+
 public class PaquetIndicationLiberation extends Paquet {
-    private int numeroConnexion;
-    private byte[] type;
+    private Directive type;
     private int adresseSource;
     private int adresseDestination;
     private String raison;
 
-    public PaquetIndicationLiberation(int numeroConnexion, byte[] type, int adresseSource, int adresseDestination, String raison) {
-        super(numeroConnexion,type,adresseSource,adresseDestination);
-        this.type = new byte[]{0,0,0,1,0,0,1,1};
+    public PaquetIndicationLiberation(int adresseSource, int adresseDestination, String raison) {
+        super(adresseSource,adresseDestination);
+        this.type = Directive.N_DISCONNECT_req;
         this.raison = raison;
     }
 
-    @Override
-    public int getNumeroConnexion() {
-        return numeroConnexion;
-    }
-
-    @Override
-    public void setNumeroConnexion(int numeroConnexion) {
-        this.numeroConnexion = numeroConnexion;
-    }
-
-    @Override
-    public byte[] getType() {
+    public Directive getType() {
         return type;
     }
 
-    @Override
-    public void setType(byte[] type) {
+    public void setType(Directive type) {
         this.type = type;
     }
 

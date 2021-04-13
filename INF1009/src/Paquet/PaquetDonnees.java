@@ -1,30 +1,32 @@
 package Paquet;
 
-public class PaquetDonnees {
-    private int numeroConnexion;
-    private byte[] type;
+import Enum.Directive;
+
+public class PaquetDonnees extends Paquet{
+    private Directive type;
     private String donnees;
+    private int adresseDestination;
     // P(s), P(R) et M
 
-    public PaquetDonnees(int numeroConnexion, byte[] type, String donnees) {
-        this.numeroConnexion = numeroConnexion;
-        this.type = type;
+    public PaquetDonnees(int addresseSource, int adresseDestination, String donnees) {
+        super(addresseSource,adresseDestination);
+        this.type = Directive.N_DATA_req;
         this.donnees = donnees;
     }
 
-    public int getNumeroConnexion() {
-        return numeroConnexion;
+    public int getAdresseDestination(){
+        return adresseDestination;
     }
 
-    public void setNumeroConnexion(int numeroConnexion) {
-        this.numeroConnexion = numeroConnexion;
+    public void setAdresseDestination(int adresseDestination) {
+        this.adresseDestination = adresseDestination;
     }
 
-    public byte[] getType() {
+    public Directive getType() {
         return type;
     }
 
-    public void setType(byte[] type) {
+    public void setType(Directive type) {
         this.type = type;
     }
 
@@ -35,4 +37,6 @@ public class PaquetDonnees {
     public void setDonnees(String donnees) {
         this.donnees = donnees;
     }
+
+  
 }
