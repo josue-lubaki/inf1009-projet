@@ -1,3 +1,6 @@
-N_CONNECT.req 52 10 null null
-N_DATA.req null null null donnée - 1
-N_DISCONNECT.req null 10 52 null
+N_CONNECT_req 52 10
+N_DATA_req 52 Ismael
+N_DISCONNECT_req 52 10
+N_CONNECT_req 52 10
+N_DATA_req 52 Ismael
+N_DISCONNECT_req 52 10

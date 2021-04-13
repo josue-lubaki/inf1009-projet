@@ -1,32 +1,12 @@
 package Paquet;
 
 public abstract class Paquet {
-    private int numeroConnexion;
-    private byte[] type;
-    private int adresseSource;
-    private int adresseDestination;
+    protected int adresseSource;
+    protected int adresseDestination;
 
-    public Paquet(int numeroConnexion, byte[] type, int adresseSource, int adresseDestination) {
-        this.numeroConnexion = numeroConnexion;
-        this.type = type;
+    public Paquet(int adresseSource, int adresseDestination) {
         this.adresseSource = adresseSource;
         this.adresseDestination = adresseDestination;
-    }
-
-    public int getNumeroConnexion() {
-        return numeroConnexion;
-    }
-
-    public void setNumeroConnexion(int numeroConnexion) {
-        this.numeroConnexion = numeroConnexion;
-    }
-
-    public byte[] getType() {
-        return type;
-    }
-
-    public void setType(byte[] type) {
-        this.type = type;
     }
 
     public int getAdresseSource() {
@@ -44,4 +24,26 @@ public abstract class Paquet {
     public void setAdresseDestination(int adresseDestination) {
         this.adresseDestination = adresseDestination;
     }
+
+    @Override
+    public String toString() {
+        if(this instanceof PaquetAppel){
+            PaquetAppel paquet = (PaquetAppel)this;
+            return paquet.getType() + " " + adresseDestination + " " + adresseSource;
+        }
+           
+        else if(this instanceof PaquetDonnees){
+            PaquetDonnees paquet = (PaquetDonnees)this;
+            return paquet.getType() + " " + adresseDestination + " " + paquet.getDonnees();
+        }
+            
+        else if(this instanceof PaquetLiberation){
+            PaquetLiberation paquet = (PaquetLiberation)this;
+            return paquet.getType() + " " + adresseDestination + " " + adresseSource;
+        }
+
+        return "Paquet [adresseDestination=" + adresseDestination + ", adresseSource=" + adresseSource + "]";
+            
+    }
+    
 }

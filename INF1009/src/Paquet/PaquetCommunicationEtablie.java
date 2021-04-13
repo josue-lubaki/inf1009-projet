@@ -1,33 +1,25 @@
 package Paquet;
 
+import Enum.Directive;
+import Enum.StatusConnection;
+
 public class PaquetCommunicationEtablie extends Paquet {
     private int numeroConnexion;
-    private byte[] type;
+    private StatusConnection type;
     private int adresseSource;
     private int adresseDestination;
 
-    public PaquetCommunicationEtablie(int numeroConnexion, byte[] type, int adresseSource, int adresseDestination) {
-        super(numeroConnexion,type,adresseSource,adresseDestination);
-        this.type = new byte[]{0,0,0,0,1,1,1,1};
+    public PaquetCommunicationEtablie(int adresseSource, int adresseDestination) {
+        super(adresseSource,adresseDestination);
+        this.type = StatusConnection.ConnectionEtablie;
     }
-
-    @Override
-    public int getNumeroConnexion() {
-        return numeroConnexion;
-    }
-
-    @Override
-    public void setNumeroConnexion(int numeroConnexion) {
-        this.numeroConnexion = numeroConnexion;
-    }
-
-    @Override
-    public byte[] getType() {
+    
+    public StatusConnection getType() {
         return type;
     }
 
-    @Override
-    public void setType(byte[] type) {
+    
+    public void setType(StatusConnection type) {
         this.type = type;
     }
 

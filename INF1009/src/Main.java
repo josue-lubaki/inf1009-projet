@@ -1,20 +1,30 @@
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
+
 import Couche.Transport;
+import Paquet.Npdu;
+
 
 
 public class Main {
-    static Transport transport = new Transport();
-    static String message;
-    static int nbTest = 0;
+    private static Queue<Npdu> CanalTransportToReseau = new SynchronousQueue<Npdu>();
+    //private static Transport transport = new Transport(CanalTransportToReseau);
+    private static Transport transport = new Transport();
+    private static String message;
+    private static int nbTest = 0;
+    private static Thread lireDeTransport, ecrireDeTransport, lireDeReseau, ecrireDeReseau;
+
 
     public static void main(String[] args){
-        genererSourceDestination();
-        transport.readFromTransport();
-        transport.writeFromTransport();
+        demarreThreads();
+        int nbreThreadCurrent = Thread.activeCount();
+        System.out.println(nbreThreadCurrent);
     }
 
     /**
      * Methode qui permet de générer les addresses sources et destinations
-     * return void
+     * @code {destination} correspond également au numero de connexion
+     * @return void
      */
     private static void genererSourceDestination(){
 
@@ -22,15 +32,39 @@ public class Main {
         int source = transport.setAdresseSource(destination);
 
         message = "N_CONNECT " + source + " " + destination + "\n" + 
-                "N_DATA test #:  " + "Donnée - " +  ++nbTest + "\n" +
+                "N_DATA " + destination + " Donnée-" +  ++nbTest + "\n" +
                 "N_DISCONNECT " + source + " " + destination + "\n";
+ 
+        transport.writeTo_S_ECR(message);
+    }
 
-                //-->to-do : ecrire dans le fichier
-                System.out.println(message );
+    /**
+     * Methode qui permet de demarrer les Threads 
+     * @return void
+     */
+    private static void demarreThreads(){
+        lireDeTransport = new Thread(transport::readFromTransport);
+        lireDeTransport.setName("Thread-lireDeTransport");
+        lireDeTransport.start();
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ecrireDeTransport = new Thread(transport::writeFromTransport);
+        ecrireDeTransport.setName("Thread-ecrireDeTransport");
+        ecrireDeTransport.start(); 
+        
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
-    
 }
 
 
